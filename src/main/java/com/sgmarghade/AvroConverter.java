@@ -29,6 +29,8 @@ public class AvroConverter {
     private static final String ARRAY = "array";
     private static final String ITEMS = "items";
     private static final String STRING = "string";
+    private static final String BOOLEAN = "boolean";
+    private static final String NULL = "null";
     private static final String RECORD = "record";
     private static final String FIELDS = "fields";
 
@@ -71,7 +73,7 @@ public class AvroConverter {
     public String convert(final String json) throws IOException {
         final JsonNode jsonNode = mapper.readTree(json);
         final ObjectNode finalSchema = mapper.createObjectNode();
-        finalSchema.put("namespace", "com.sgmarghade.test");
+        finalSchema.put("namespace", "com.tyco.taas");
         finalSchema.put(NAME, "outer_record");
         finalSchema.put(TYPE, RECORD);
         finalSchema.set(FIELDS, getFields(jsonNode));
@@ -94,6 +96,14 @@ public class AvroConverter {
             switch (nextNode.getNodeType()) {
                 case NUMBER:
                     fields.add(mapper.createObjectNode().put(NAME, map.getKey()).put(TYPE, (nextNode.isLong() ? "long" : "double")));
+                    break;
+
+                case BOOLEAN:
+                    fields.add(mapper.createObjectNode().put(NAME, map.getKey()).put(TYPE, BOOLEAN));
+                    break;
+
+                case NULL:
+                    fields.add(mapper.createObjectNode().put(NAME, map.getKey()).put(TYPE, NULL));
                     break;
 
                 case STRING:
